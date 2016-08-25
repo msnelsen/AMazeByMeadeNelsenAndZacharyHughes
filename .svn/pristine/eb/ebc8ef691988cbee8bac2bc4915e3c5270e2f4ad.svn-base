@@ -1,0 +1,72 @@
+package edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad;
+import java.util.Random;
+import java.util.Random.*;
+
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad.Robot.Turn;
+
+public class Gambler extends AutoDriver implements RobotDriver {
+	
+	public Gambler(){
+		super();
+	}
+
+	/**
+	 * Returns a @return boolean. Hopefully navigates from the begining position
+	 * to the end by randomly selecting a direction and going in it. This continues until 
+	 * the battery is depleted or the robot has reached its final destination.  
+	 */
+	@Override 
+	public boolean drive2Exit() throws Exception {
+		Random random = new Random();
+		int direction = random.nextInt(4);
+		try{
+			while(this.ottoVonRobot.isAtGoal() == false){
+				if(direction == 0){
+					this.ottoVonRobot.move(1);	
+					 
+				}
+				else if(direction == 1){
+					this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+					this.ottoVonRobot.move(1);
+					
+				}
+				else if(direction == 2){
+					this.ottoVonRobot.rotate(Robot.Turn.RIGHT);
+					this.ottoVonRobot.move(1);	
+					
+					}
+				else{
+					this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+					this.ottoVonRobot.move(1);
+					
+				}
+				direction = random.nextInt(4); 
+				
+			}
+			
+			while (this.ottoVonRobot.canSeeGoal(Robot.Direction.FORWARD) == false){
+				this.ottoVonRobot.rotate(Turn.LEFT);
+			}
+			
+			this.ottoVonRobot.move(1);
+			
+			return true; 
+			
+			}
+	
+		catch(Exception exception){
+			if(this.ottoVonRobot.robotMaze.isEndPosition(this.ottoVonRobot.robotMaze.px, this.ottoVonRobot.robotMaze.py)){
+				this.ottoVonRobot.robotMaze.state = Constants.STATE_FINISH; 
+				return true; 
+			}
+			this.ottoVonRobot.robotMaze.state = Constants.STATE_UNFINISH;
+			System.out.println("Issue with the exception in Gambler"); 
+			this.ottoVonRobot.robotMaze.notifyViewerRedraw();
+			return false;	
+			}	
+			}
+		
+	}
+	
+
+

@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.PlayActivity" >
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
+    <item android:id="@+id/topdown"
+          android:icon="@drawable/rsz_compassrose"
+          android:title="@string/topdown"
+          app:showAsAction="always" />
+    <!-- Settings, should always be in the overflow -->
+    <item android:id="@+id/solution"
+          android:title="@string/solution"
+          android:icon="@drawable/rsz_questionmark"
+          app:showAsAction="always" />
+    <item android:id="@+id/visible"
+          android:title="@string/visible"
+          android:icon="@drawable/rsz_eyeicon"
+          app:showAsAction="always" />
+    <item android:id="@+id/zoomin"
+          android:title="Zoom In"
+          app:showAsAction="never" />
+    <item android:id="@+id/zoomout"
+          android:title="Zoom Out"
+          app:showAsAction="never"/>
+
+</menu>

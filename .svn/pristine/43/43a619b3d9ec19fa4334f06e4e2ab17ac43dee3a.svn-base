@@ -1,0 +1,166 @@
+package ui;
+
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.id;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.layout;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.menu;
+import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.app.ActionBar;
+
+
+public class PlayActivity extends ActionBarActivity {
+	
+	private ImageButton up; 
+	private ImageButton down; 
+	private ImageButton left; 
+	private ImageButton right; 
+	private Button pausePlay; 
+	private Button skip; 
+
+	/**
+	 * Takes in @param savedInstanceState. Initializes the activity and 
+	 * sets the content view, defining the UI. 
+	 */
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_play);
+		Intent intentIn = getIntent();
+		String message = intentIn.getStringExtra(AMazeActivity.EXTRA_MESSAGE);
+		System.out.println(message);
+		initializeVariables(); 
+		if (message.equals("Manual")){
+			pausePlay.setVisibility(View.GONE);
+		}
+		else{
+			up.setVisibility(View.GONE);
+			down.setVisibility(View.GONE);
+			left.setVisibility(View.GONE);
+			right.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * Takes in @param menu. Defines the utility of the action bar. 
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.play, menu);
+		return true;
+	}
+
+	/**
+	 * Takes in @param item. Defines how item clicks to the action bar are handled.
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		else if(id == R.id.visible){
+			Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Visible Walls Selected");
+            Toast.makeText(getApplicationContext(), "Toggle Visible Walls", Toast.LENGTH_SHORT).show();
+
+		}
+		else if(id == R.id.solution){
+			Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Show Solution Selected");
+            Toast.makeText(getApplicationContext(), "Toggle Solution", Toast.LENGTH_SHORT).show();
+
+		}
+		else if(id == R.id.topdown){
+			Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Top-Down View Selected");
+            Toast.makeText(getApplicationContext(), "Toggle Top-Down View", Toast.LENGTH_SHORT).show();
+
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Takes in @param view. Notifies LogCat that the up button has been pushed. 
+	 */
+	public void up(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Up");
+	}
+	
+	/**
+	 * Takes in @param view. Notifies LogCat that the down button has been pushed. 
+	 */
+	public void down(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Down");
+	}
+	
+	/**
+	 * Takes in @param view. Notifies LogCat that the left button has been pushed. 
+	 */
+	public void left(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Left");
+	}
+	
+	/**
+	 * Takes in @param view. Notifies LogCat that the right button has been pushed. 
+	 */
+	public void right(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Right");
+	}
+	
+	/**
+	 * Takes in @param view. Notifies LogCat that the skip button has been pushed, 
+	 * then establishes intent and moves to another activity.
+	 */
+	public void finishMaze(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Ending Early");
+		Intent intent = new Intent(this, FinishActivity.class);
+		startActivity(intent);
+	}
+	
+	/** 
+	 * Takes in @param view. Notifies LogCat that the pause button has been pushed. 
+	 */
+	public void pausePlay(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Paused/Started");
+	}
+	
+	/**
+	 * Initializes the various buttons used in the play state. 
+	 */
+	public void initializeVariables(){
+	    up = (ImageButton) findViewById(R.id.UP);
+	    down = (ImageButton) findViewById(R.id.DOWN); 
+	    left = (ImageButton) findViewById(R.id.LEFT); 
+	    right = (ImageButton) findViewById(R.id.RIGHT);
+	    pausePlay = (Button) findViewById(R.id.pauseplay); 
+	    skip = (Button) findViewById(R.id.skip); 
+	    pausePlay = (Button) findViewById(R.id.pauseplay); 
+	    }
+	
+	
+    /**
+     * Overrides the back button so that it returns the user to the beginning 
+     * activity, as per the project specifications. 
+     */
+	@Override
+	public void onBackPressed()
+	{
+	    Intent intent = new Intent(this, AMazeActivity.class);
+	    startActivity(intent);
+	    super.onBackPressed();
+	}
+	
+	}

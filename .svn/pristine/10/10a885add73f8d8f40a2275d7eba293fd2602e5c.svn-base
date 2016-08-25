@@ -1,0 +1,97 @@
+package edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.ui;
+
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.id;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.layout;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.menu;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad.BasicRobot;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad.Maze;
+import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+public class FinishActivity extends ActionBarActivity {
+	Maze maze;
+	BasicRobot roboto;
+	TextView successStatement;
+	TextView failureStatement;
+	TextView pathLengthStatement; 
+	TextView batteryStatement; 
+
+	/**
+	 * Takes in @param savedInstanceState. Initializes the activity and 
+	 * sets the content view, defining the UI. 
+	 */
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_finish);
+		this.maze = ((Maze)getApplicationContext());
+		//maze = (Maze) getIntent().getSerializableExtra(PlayActivity.EXTRA_MESSAGE4);
+		roboto = this.maze.mazeRobot;
+		successStatement = (TextView) findViewById(R.id.textView2);
+		failureStatement = (TextView) findViewById(R.id.textView5);
+		pathLengthStatement = (TextView) findViewById(R.id.textView7); 
+		batteryStatement = (TextView) findViewById(R.id.textView6);
+		batteryStatement.setText(String.valueOf( this.roboto.getBatteryLevel())); 
+		pathLengthStatement.setText(String.valueOf( this.roboto.driver.getPathLength())); 
+		
+		if(this.maze.isEndPosition(this.maze.px, this.maze.py)){
+			failureStatement.setVisibility(View.GONE);
+		}else{
+			successStatement.setVisibility(View.GONE);
+		};
+	}
+	
+	/**
+	 * Takes in @param menu. Defines the utility of the action bar. 
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.finish, menu);
+		return true;
+	}
+
+	/**
+	 * Takes in @param item. Defines how item clicks to the action bar are handled.
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Takes in @param view. Notifies LogCat that the user has chosen to start over, 
+	 * then establishes intent and returns to the beginning screen. 
+	 */
+	public void startOver(View view){
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Started Over");
+		Intent intent = new Intent(this, AMazeActivity.class);
+		startActivity(intent);
+	}
+	
+    /**
+     * Overrides the back button so that it returns the user to the beginning 
+     * activity, as per the project specifications. 
+     */
+	@Override
+	public void onBackPressed()
+	{
+	    Intent intent = new Intent(this, AMazeActivity.class);
+	    startActivity(intent);
+	    super.onBackPressed();
+	}
+}

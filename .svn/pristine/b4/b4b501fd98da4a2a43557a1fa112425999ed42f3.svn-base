@@ -1,0 +1,127 @@
+package ui;
+
+
+import java.util.TimerTask;
+
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.id;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.layout;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.R.menu;
+import android.support.v7.app.ActionBarActivity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+public class GeneratingActivity extends ActionBarActivity {
+	
+	
+	private ProgressBar progressBar1; 
+	private Handler handler = new Handler(); 
+	private int progress = 0; 
+	private Button button1;
+	
+	/**
+	 * Takes in @param savedInstanceState. Initializes the activity and 
+	 * sets the content view, defining the UI. 
+	 */
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_generating);
+		
+		initializeVariables(); 
+		new Thread(new Runnable(){
+			public void run(){
+				while (progressBar1.getProgress() <=100){
+					progress++;
+					
+					handler.post(new Runnable(){
+						public void run(){
+							progressBar1.setProgress(progress);
+						}
+					});
+					try{
+						Thread.sleep(20);
+					}
+					catch (InterruptedException e){
+						e.printStackTrace(); 
+					}
+				}
+			}
+		}).start();
+		button1.setVisibility(View.VISIBLE);
+
+	}
+
+	/**
+	 * Takes in @param menu. Defines the utility of the action bar. 
+	 */
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.generating, menu);
+		return true;
+	}
+
+	/**
+	 * Takes in @param item. Defines how item clicks to the action bar are handled.
+	 */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Initializes the progress bar.  
+	 */
+    private void initializeVariables() {
+        progressBar1 = (ProgressBar)findViewById(R.id.progressBar1); 
+        progressBar1.setMax(100);
+        button1 = (Button)findViewById(R.id.button1);
+        button1.setVisibility(View.INVISIBLE);
+        }
+    
+    /**
+     * Takes in @param view. Establishes intent, outputs to LogCat, and 
+     * transfers to the next activity.
+     */
+    public void hitTheButton(View view) {
+		Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "Begin playing maze");
+    	Intent intentIn = getIntent();
+		String message = intentIn.getStringExtra(AMazeActivity.EXTRA_MESSAGE);
+		Intent intentOut = new Intent(this, PlayActivity.class);
+		intentOut.putExtra(AMazeActivity.EXTRA_MESSAGE, message);
+		startActivity(intentOut);
+		
+    }
+    
+    
+    /**
+     * Overrides the back button so that it returns the user to the beginning 
+     * activity, as per the project specifications. 
+     */
+    @Override
+	public void onBackPressed(){
+	    Intent intent = new Intent(this, AMazeActivity.class);
+	    startActivity(intent);
+	    super.onBackPressed();
+	}
+}

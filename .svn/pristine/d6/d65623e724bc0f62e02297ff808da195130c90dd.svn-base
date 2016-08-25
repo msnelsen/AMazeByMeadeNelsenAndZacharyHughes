@@ -1,0 +1,85 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/playout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.ui.PlayActivity" >
+
+
+    <Button
+        android:id="@+id/skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/UP"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        
+        android:onClick="finishMaze"
+        android:text="@string/skipper" />
+
+        
+
+    <ImageButton
+        android:id="@+id/UP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/LEFT"
+        android:layout_centerHorizontal="true"
+        android:onClick="up"
+        android:src="@drawable/rsz_uparrow" />
+
+    <ImageButton
+        android:id="@+id/RIGHT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/DOWN"
+        android:layout_toRightOf="@+id/DOWN"
+        android:onClick="right"
+        android:src="@drawable/rsz_rightarrow" />
+
+    <ImageButton
+        android:id="@+id/DOWN"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/UP"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="38dp"
+        android:onClick="down"
+        android:src="@drawable/rsz_downarrow" />
+
+    <ImageButton
+        android:id="@+id/LEFT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/DOWN"
+        android:layout_toLeftOf="@+id/DOWN"
+        android:onClick="left"
+        android:src="@drawable/rsz_leftarrow" />
+
+    <Button
+        android:id="@+id/pauseplay"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/UP"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        
+        android:onClick="pausePlay"
+        android:text="@string/pauseplay" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="40dp" />
+
+</RelativeLayout>

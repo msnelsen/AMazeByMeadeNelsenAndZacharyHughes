@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AMazeBy&lt;MeadeNelsenAndZacharyHughes></string>
+    <string name="welcome_maze">Welcome to the Maze!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_generating">GeneratingActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_play">PlayActivity</string>
+    <string name="title_activity_finish">FinishActivity</string>
+    <string name="finish"></string>
+    <string name="button_start">Generate Maze</string>
+    <string name="difficulty_main">Difficulty</string>
+    <string name="generation_prompt">Choose a Generation Option</string>
+    <string name="navigation_prompt">Choose a Navigation Method</string>
+    
+    <string-array name="navigation_arrays">
+        <item>Manual</item>
+        <item>Gambler</item>
+        <item>Wall-Follower</item>
+        <item>Wizard</item>
+        <item>Tremaux\'s</item>
+    </string-array>
+    
+    <string-array name="generation_arrays">
+        <item>Random - Aldous-Broder</item>
+        <item>Random - DFS</item>
+        <item>Random - Prim\'s</item>
+        <item>From File - Small</item>
+        <item>From File - Medium</item>
+        <item>From File - Large</item>
+        <item>From File - X-Large</item>
+    </string-array>
+        
+        <string name="playButton">Play</string>        
+        <string name="skipper">Skip</string>
+        <string name="description"> arrow </string>
+        <string name="pauseplay">Start or Stop</string>
+        <string name="topdown">View Maze Top Down</string>
+        <string name="solution">Show Solution</string>
+        <string name="visible">Show Visible Walls</string>
+
+</resources>

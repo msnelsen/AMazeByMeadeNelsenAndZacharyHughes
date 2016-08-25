@@ -1,0 +1,504 @@
+package edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad;
+
+
+
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad.*;
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.ui.PlayActivity;
+import android.R;
+
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
+import android.os.Message;
+import android.util.Log;
+
+public class MazePanel extends Canvas {
+	/* Panel operates a double buffer see
+	 * http://www.codeproject.com/Articles/2136/Double-buffer-in-standard-Java-AWT
+	 * for details
+	 */
+	
+	Bitmap bufferImage; 
+	Canvas gc; 
+	PlayActivity playActivity;
+	Canvas canvas;
+	Paint color = new Paint();
+	Drawable ceilingImage;
+	Rect myRect = new Rect();
+	Rect ceilingRect = new Rect();
+	Paint piggitypaint = new Paint();
+	
+	
+	public enum Event {GENERATION, DRIVING, CHALLENGE, START}; 
+
+	Maze maze;
+	
+	public MazePanel() {
+		super() ;
+	}
+	
+	public void update(Canvas g) {
+		
+		paint(g) ;
+		
+	}
+	/**
+	 * paints images using the bitmap, onto passed in parameter g
+	 * @param g
+	 */
+	public void paint(Canvas g) {
+		
+		if (bufferImage == null){
+			bufferImage = Bitmap.createBitmap(Constants.VIEW_WIDTH, Constants.VIEW_HEIGHT, Bitmap.Config.ARGB_8888);
+		}
+		g.drawBitmap(bufferImage, 0, 0, null) ;
+		
+	}
+	
+	/**
+	 * Sets the buffer image to the passed in buffer
+	 * @param buffer
+	 */
+
+	public void setBufferImage(Bitmap buffer) {
+		bufferImage = buffer ;
+	}
+	
+	/**
+	 * Initializes the buffer image, with an error that catches if the buffer image failed
+	 */
+	
+	public void initBufferImage() {
+		
+		bufferImage = Bitmap.createBitmap(Constants.VIEW_WIDTH, Constants.VIEW_HEIGHT, Bitmap.Config.ARGB_8888);
+		if (null == bufferImage){
+			
+			System.out.println("Error: creation of buffered image failed, presumedly container not displayable");
+		}
+	}
+
+	/**
+	 * returns the buffer graphics
+	 */
+	public Canvas getBufferGraphics() {
+		
+		if (null == bufferImage)
+			initBufferImage() ;
+		return getGraphics(bufferImage) ;
+	}
+	
+	/**
+	 * updates paint with the received graphics
+	 */
+	public void update() {
+		
+		paint(getGraphics());
+	}
+	
+	/**
+	 * returns the canvas of the MazePanel
+	 */
+	public Canvas getGraphics(Bitmap bufferImage){
+		return gc; 
+	}
+	
+	/**
+	 * returns a new Canvas
+	 */
+	public Canvas getGraphics(){
+		return new Canvas(); 
+	}
+	
+	/**
+	 * Sets the panal's playActivity to the @param pAct.
+	 */
+	
+	public void setPlayActivity(PlayActivity pAct){
+		this.playActivity = pAct;
+	}
+	
+	/**
+	 * Sets the panel's play activity to the @param Canvas
+	 */
+	
+	public void setCanvas(Canvas canvas){
+		this.canvas = canvas;
+	}
+	
+	/**
+	 * Given @param application, inks the panel to an application
+	 */
+//	public void setApplication(MazeApplication application){
+//		this.mazeApp = application; 
+//	}
+
+	/**
+	 * Given @param maze, links the panel to a maze
+	 */
+	public void setMaze(Maze maze) {
+		// TODO Auto-generated method stub
+		this.maze = maze;
+	}
+	
+	/**
+	 * returns the color value set py the painter
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public Paint getColor(int x, int y, int z){
+		Paint color = new Paint();
+		color.setARGB(255, x, y, z);
+		return color;
+		
+	}
+	
+	/**
+	 * returns @param obj's color attribute
+	 * @param obj
+	 * @return
+	 */
+	public int dummyGetRGB(Object obj){
+		return ((Paint) obj).getColor(); 
+	}
+	
+	/**
+	 * sets the color of @param gr to @param color
+	 * @param gr
+	 * @param color
+	 */
+	
+	public void dummySetColor(Paint gr, int color){
+		gr.setColor(color);
+	}
+	
+	/**
+	 * creates and fills a polygon using the path class, which draws lines in the polygon and
+	 * fills the path with the selected color
+	 * @param gr
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void dummyFillPolygon(Object gr, int[] x, int[] y, int z){
+		//System.out.print("FillPoly is being called! \n");
+		Drawable mCustomImage = this.playActivity.floor;
+		 //Initialize the bitmap object by loading an image from the resources folder  
+	    Bitmap fillBMP = this.playActivity.fillBMP; 
+	    //Initialize the BitmapShader with the Bitmap object and set the texture tile mode  
+	    BitmapShader fillBMPshader = new BitmapShader(fillBMP, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);  
+        
+	    piggitypaint.setStyle(Paint.Style.FILL);  
+	    //Assign the 'fillBMPshader' to this paint  
+	    piggitypaint.setShader(fillBMPshader);  
+
+	    //Draw the fill of any shape you want, using the paint object.
+		//color.setColor(Color.BLACK);
+		//path path path
+		Path path = new Path();
+		path.moveTo(x[0], y[0]);
+		for (int i = 1; i < x.length; i++){
+			path.lineTo(x[i], y[i]); 
+		}
+		
+		path.lineTo(x[0], y[0]);
+		this.canvas.drawPath(path, piggitypaint);
+		//fillBMP.recycle();
+		//((Graphics) gr).fillPolygon(x, y, z);
+	}
+
+	/**
+	 * Draws the first person view on the screen during the game
+	 * @param firstPersonDrawer TODO
+	 * @param gc graphics handler for the buffer image that this class draws on
+	 * @param state TODO
+	 * @param px x coordinate of current position, only used to get viewx
+	 * @param py y coordinate of current position, only used to get viewy
+	 * @param view_dx view direction, x coordinate
+	 * @param view_dy view direction, y coordinate
+	 * @param walk_step TODO
+	 * @param view_offset TODO
+	 * @param rset
+	 * @param ang
+	 * @param walk_step, only used to get viewx and viewy
+	 * @param view_offset, only used to get viewx and viewy
+	 */
+	public void dummyRedraw(FirstPersonDrawer firstPersonDrawer, Canvas gc, int state, int px, int py, int view_dx, int view_dy, int walk_step, int view_offset, RangeSet rset, int ang) {
+		// if notified by model that state has changed
+		// Query model for parameters
+		//dbg("viewer.redraw called");
+		
+		//Log.w("AMazeBy<MeadeNelsenandZacharyHughes", "First person drawer redrawn");
+		
+		if (firstPersonDrawer == null)
+			System.out.println("First Person Drawer parameter is null.");
+		
+		if (gc == null)
+			System.out.println("Canvas parameter is null.");
+		
+		if (rset == null)
+			System.out.println("Rset parameter is null.");
+
+		if (state != Constants.STATE_PLAY)
+			return ;
+		// new adjustment
+		firstPersonDrawer.canvas = gc ;
+		firstPersonDrawer.rset = rset ;
+		firstPersonDrawer.view_dx = view_dx ;
+		firstPersonDrawer.view_dy = view_dy ;
+		firstPersonDrawer.angle = ang ;
+		
+		// calculate view
+		firstPersonDrawer.viewx = (px*firstPersonDrawer.map_unit+firstPersonDrawer.map_unit/2) + firstPersonDrawer.viewd_unscale(view_dx*(firstPersonDrawer.step_size*walk_step-view_offset));
+		firstPersonDrawer.viewy = (py*firstPersonDrawer.map_unit+firstPersonDrawer.map_unit/2) + firstPersonDrawer.viewd_unscale(view_dy*(firstPersonDrawer.step_size*walk_step-view_offset));
+		// update graphics
+		// draw black background on lower half
+		color.setColor(Color.WHITE);
+		ceilingRect.set(0, 0, firstPersonDrawer.view_width, firstPersonDrawer.view_height/2);
+		if(this.maze.dx == 0 && this.maze.dy == 1){
+			//1
+			ceilingImage = this.playActivity.ceilingImage1;
+			ceilingImage.setBounds(ceilingRect);
+			ceilingImage.draw(canvas);
+		//	this.maze.notifyViewerRedraw();
+		}
+		else if(this.maze.dx == 0 && this.maze.dy == -1){
+			//3
+			ceilingImage = this.playActivity.ceilingImage3;
+			ceilingImage.setBounds(ceilingRect);
+			ceilingImage.draw(canvas);
+		//	this.maze.notifyViewerRedraw();
+		}
+		else if(this.maze.dx == 1 && this.maze.dy == 0){
+			//2
+			ceilingImage = this.playActivity.ceilingImage2;
+			ceilingImage.setBounds(ceilingRect);
+			ceilingImage.draw(canvas);
+		//	this.maze.notifyViewerRedraw();
+		}
+		else if(this.maze.dx == -1 && this.maze.dy == 0){
+			//4
+			ceilingImage = this.playActivity.ceilingImage4;
+			ceilingImage.setBounds(ceilingRect);
+			ceilingImage.draw(canvas);
+		//	this.maze.notifyViewerRedraw();
+		}
+		Drawable mCustomImage = this.playActivity.floor;
+		myRect.set(0, firstPersonDrawer.view_height/2, firstPersonDrawer.view_width , firstPersonDrawer.view_height);
+		mCustomImage.setBounds(myRect);
+		mCustomImage.draw(canvas);
+//		System.out.println("CATS ARE NICE");
+		//this.canvas.drawRect(new Rect(0, 0, firstPersonDrawer.view_width , firstPersonDrawer.view_height/2), color);
+		// draw dark gray background on upper half
+		color.setColor(Color.WHITE);
+	//	this.canvas.drawRect(new Rect(0, 0, firstPersonDrawer.view_width, firstPersonDrawer.view_height/2), color);
+		// set color to white and draw what ever can be seen from the current position
+		color.setColor(Color.WHITE);
+		rset.set(0, firstPersonDrawer.view_width-1); // reset set of ranges to set with single new element (0,width-1)
+		// debug: reset counters
+		firstPersonDrawer.traverse_node_ct = firstPersonDrawer.traverse_ssector_ct =
+			firstPersonDrawer.drawrect_ct = firstPersonDrawer.drawrect_late_ct = firstPersonDrawer.drawrect_segment_ct = 0;
+		//
+		firstPersonDrawer.drawAllVisibleSectors(firstPersonDrawer.bsp_root);
+	//	System.gc();
+	}
+
+
+
+/**
+ * Redraws the mapDrawer using the passed in pararmetes.  This process is described in more detail in
+ * mapDrawer.redraw
+ * @param mapDrawer
+ * @param gc
+ * @param state
+ * @param px
+ * @param py
+ * @param view_dx
+ * @param view_dy
+ * @param walk_step
+ * @param view_offset
+ * @param rset
+ * @param ang
+ */
+	
+	public void redrawMapDrawer(MapDrawer mapDrawer, Canvas gc, int state, int px, int py, int view_dx, int view_dy, int walk_step, int view_offset, RangeSet rset, int ang) {
+		//dbg("redraw") ;
+		//System.out.println("redrawMapDrawer Called");
+		//Log.w("AMazeBy<MeadeNelsenandZacharyHughes>", "Redraw Map Drawer drawn");
+		if (state != Constants.STATE_PLAY){
+			System.out.println("Not in state play!"); 
+			return ;
+		}
+		if (mapDrawer.maze.isInMapMode()) {
+			draw_map(mapDrawer, gc, px, py, walk_step, view_dx, view_dy, mapDrawer.maze.isInShowMazeMode(), mapDrawer.maze.isInShowSolutionMode()) ;
+			draw_currentlocation(mapDrawer, gc, view_dx, view_dy) ;
+		//	System.gc();
+		}
+	}
+	/**
+	 * Helper method for redraw_play, called if map_mode is true, i.e. the users wants to see the overall map.
+	 * The map is drawn only on a small rectangle inside the maze area such that only a part of the map is actually shown.
+	 * Of course a part covering the current location needs to be displayed.
+	 * @param mapDrawer TODO
+	 * @param gc graphics handler to manipulate screen
+	 * @param px TODO
+	 * @param py TODO
+	 * @param walk_step TODO
+	 * @param view_dx TODO
+	 * @param view_dy TODO
+	 * @param showMaze TODO
+	 * @param showSolution TODO
+	 */
+	public void draw_map(MapDrawer mapDrawer, Canvas gc, int px, int py, int walk_step, int view_dx, int view_dy, boolean showMaze, boolean showSolution) {
+        
+		//dummySetColor(this.color, Color.BLUE);
+		this.color.setColor(Color.BLUE);
+		int vx = px*mapDrawer.map_unit+mapDrawer.map_unit/2;
+		vx += mapDrawer.viewd_unscale(view_dx*(mapDrawer.step_size*walk_step));
+		int vy = py*mapDrawer.map_unit+mapDrawer.map_unit/2;
+		vy += mapDrawer.viewd_unscale(view_dy*(mapDrawer.step_size*walk_step));
+		int offx = -vx*mapDrawer.map_scale/mapDrawer.map_unit + mapDrawer.view_width/2;
+		int offy = -vy*mapDrawer.map_scale/mapDrawer.map_unit + mapDrawer.view_height/2;
+		// get minimum for x,y
+		int xmin = -offx/mapDrawer.map_scale;
+		int ymin = -offy/mapDrawer.map_scale;
+		if (xmin < 0) xmin = 0; 
+		if (ymin < 0) ymin = 0;
+		// get maximum for x,y
+		int xmax = (mapDrawer.view_width -offx)/mapDrawer.map_scale+1;
+		int ymax = (mapDrawer.view_height-offy)/mapDrawer.map_scale+1;
+		if (xmax >= mapDrawer.mazew)  xmax = mapDrawer.mazew;
+		if (ymax >= mapDrawer.mazeh)  ymax = mapDrawer.mazeh;
+		// iterate over integer grid between min and max of x,y
+		for (int y = ymin; y <= ymax; y++)
+			for (int x = xmin; x <= xmax; x++) {
+				int nx1 = x*mapDrawer.map_scale + offx;
+				int ny1 = mapDrawer.view_height-1-(y*mapDrawer.map_scale + offy);
+				int nx2 = nx1 + mapDrawer.map_scale;
+				int ny2 = ny1 - mapDrawer.map_scale;
+
+				boolean w = (x >= mapDrawer.mazew) ? false : ((y < mapDrawer.mazeh) ?
+						mapDrawer.mazecells.hasWallOnTop(x,y) :
+							mapDrawer.mazecells.hasWallOnBottom(x, y-1));
+	
+			
+			if (this.canvas == null){
+				System.out.println("Uh oh spaghettios!");
+//				Bitmap bitmap = Bitmap.createBitmap(400, 400, Bitmap.Config.ARGB_8888);
+//				this.canvas = new Canvas(bitmap); 
+			}
+			
+				mapDrawer.maze.panel.dummySetColor(color, (mapDrawer.seencells.hasWallOnTop(x, y) ? Color.MAGENTA : Color.RED));
+				//gc.setColor(seencells.hasWallOnTop(x, y) ? Color.white : Color.gray);
+				if ((mapDrawer.seencells.hasWallOnTop(x, y) || showMaze) && w)
+					this.canvas.drawLine(nx1, ny1, nx2, ny1, this.color);
+
+				w = (y >= mapDrawer.mazeh) ? false : ((x < mapDrawer.mazew) ?
+						mapDrawer.mazecells.hasWallOnLeft(x, y) :
+							mapDrawer.mazecells.hasWallOnRight((x-1), y));
+				
+				mapDrawer.maze.panel.dummySetColor(color, (mapDrawer.seencells.hasWallOnLeft(x, y) ? Color.MAGENTA : Color.RED));
+				//gc.setColor(seencells.hasWallOnLeft(x, y) ? Color.white : Color.gray);
+				if ((mapDrawer.seencells.hasWallOnLeft(x, y) || showMaze) && w)
+					this.canvas.drawLine(nx1, ny1, nx1, ny2, this.color);
+			}
+		if (showSolution) {
+			//draw_solution(gc, offx, offy);
+			mapDrawer.draw_solution(this.canvas, offx, offy, px, py) ;
+		}
+		
+		// draw an oval red shape for the current position and direction on the maze
+		mapDrawer.draw_currentlocation(gc, view_dx, view_dy);
+//		this.maze.notifyViewerRedraw();
+		//System.out.println("Made it to the end of the map drawer");
+	
+	}
+	/**
+	 * Draws an oval red shape with and arrow for the current position and direction on the maze.
+	 * It always reside on the center of the screen. The map drawing moves if the user changes location.
+	 * @param mapDrawer TODO
+	 * @param gc
+	 * @param view_dx TODO
+	 * @param view_dy TODO
+	 */
+	public void draw_currentlocation(MapDrawer mapDrawer, Object gc, int view_dx, int view_dy) {
+		mapDrawer.maze.panel.dummySetColor(color, Color.BLUE);
+		//paint.setColor(Color.red);
+		// draw oval of appropriate size at the center of the screen
+		int ctrx = mapDrawer.view_width/2; // center x
+		int ctry = mapDrawer.view_height/2; // center y
+		int cirsiz = mapDrawer.map_scale/2; // circle size
+		canvas.drawRect(3, 3, 3, 3, color);
+
+		//canvas.drawRect(ctrx-cirsiz/2, ctry-cirsiz/2, cirsiz, cirsiz, color);
+		// draw a red arrow with the oval to indicate direction
+		int arrlen = 7*mapDrawer.map_scale/16; // arrow length
+		int aptx = ctrx + ((arrlen * view_dx) >> 16);
+		int apty = ctry - ((arrlen * view_dy) >> 16);
+		int arrlen2 = mapDrawer.map_scale/4;
+		int aptx2 = ctrx + ((arrlen2 * view_dx) >> 16);
+		int apty2 = ctry - ((arrlen2 * view_dy) >> 16);
+		//int ptoflen = map_scale/8; // unused
+		int ptofx = -( arrlen2 * view_dy) >> 16;
+		int ptofy = -( arrlen2 * view_dx) >> 16;
+		this.canvas.drawLine(ctrx, ctry, aptx, apty, color);
+		this.canvas.drawLine(aptx, apty, aptx2 + ptofx, apty2 + ptofy, color);
+		this.canvas.drawLine(aptx, apty, aptx2 - ptofx, apty2 - ptofy, color);
+	}
+	/**
+	 * Draws a yellow line to show the solution on the overall map. 
+	 * Method is only called if in STATE_PLAY and map_mode and showSolution are true.
+	 * Since the current position is fixed at the center of the screen, all lines on the map are drawn with some offset.
+	 * @param mapDrawer TODO
+	 * @param gc to draw lines on
+	 * @param offx
+	 * @param offy
+	 * @param px TODO
+	 * @param py TODO
+	 */
+	public void draw_solution(MapDrawer mapDrawer, Canvas gc, int offx, int offy, int px, int py) {
+		// check parameters:
+		System.out.println("Draw Solution");
+		if ((px < 0 || px > mapDrawer.mazew) || (px < 0 || py > mapDrawer.mazew))
+		{
+			mapDrawer.dbg(" Parameter error: position out of bounds: (" + px + "," + py + ") for maze of size " + mapDrawer.mazew + "," + mapDrawer.mazeh) ;
+			return ;
+		}
+		// current position on the solution path (sx,sy)
+		int sx = px;
+		int sy = py;
+		int d = mapDrawer.mazedists[sx][sy]; // current distance towards end position
+		mapDrawer.maze.panel.dummySetColor(color, Color.YELLOW);
+	//		gc.setColor(Color.yellow);
+		// while we are more than 1 step away from the final position
+		while (d > 1) {
+			// find the direction towards the end position
+			int n = mapDrawer.getDirectionIndexTowardsSolution(sx, sy, d) ;
+			if (4 == n)
+			{
+				System.out.println("ERROR: draw_solution cannot identify direction towards solution!") ;
+				// TODO: perform proper error handling here
+				return ;
+			}
+			int dx = Constants.DIRS_X[n];
+			int dy = Constants.DIRS_Y[n];
+			int dn = mapDrawer.mazedists[sx+dx][sy+dy];
+			// calculate coordinates and delta values towards new coordinates
+			int nx1 = sx*mapDrawer.map_scale + offx + mapDrawer.map_scale/2;
+			int ny1 = mapDrawer.view_height-1-(sy*mapDrawer.map_scale + offy) - mapDrawer.map_scale/2;
+			int ndx =  dx * mapDrawer.map_scale;
+			int ndy = -dy * mapDrawer.map_scale;
+			// do the graphics
+			this.canvas.drawLine(nx1, ny1, nx1+ndx, ny1+ndy, color);
+			// update loop variables for current position (sx,sy) and distance d for next iteration
+			sx += dx;
+			sy += dy;
+			d = dn;
+		}
+	}
+	
+
+
+
+	
+}

@@ -1,0 +1,152 @@
+package edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad;
+
+
+
+public class Wizard extends AutoDriver implements RobotDriver {
+	
+	public Wizard(){
+		super();
+	}
+	
+	/**
+	 * Returns a @return boolean. Cheats and utilizes the distance matrix in the system 
+	 * to determine the overall optimal route.   
+	 */
+	@Override
+	public boolean drive2Exit() throws Exception {
+		
+		try{
+			
+			int northDist, southDist, eastDist, westDist;
+			northDist = Integer.MAX_VALUE; 
+			southDist = Integer.MAX_VALUE;
+			eastDist = Integer.MAX_VALUE;  
+			westDist = Integer.MAX_VALUE; 
+			int currentX = this.ottoVonRobot.getCurrentPosition()[0]; 
+			int currentY = this.ottoVonRobot.getCurrentPosition()[1]; 
+	
+			while (this.ottoVonRobot.isAtGoal() == false){
+				
+				currentX = this.ottoVonRobot.getCurrentPosition()[0]; 
+				currentY = this.ottoVonRobot.getCurrentPosition()[1]; 
+				
+				if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnTop(currentX, currentY) == false){
+					northDist = this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX,  currentY - 1); 
+				}
+				if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnBottom(currentX, currentY) == false){
+					southDist = this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX,  currentY + 1); 
+				}
+				if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnLeft(currentX, currentY) == false){
+					westDist = this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX - 1,  currentY); 
+				}
+				if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnRight(currentX, currentY) == false){
+					eastDist = this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX + 1,  currentY); 
+				}
+				
+//				if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnLeft(currentX, currentY) == false && this.ottoVonRobot.robotMaze.isEndPosition(currentX - 1, currentY)){
+//					this.ottoVonRobot.turnToWest(); 
+//					this.ottoVonRobot.move(1);
+//				}
+//				
+//				else if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnRight(currentX, currentY) == false && this.ottoVonRobot.robotMaze.isEndPosition(currentX + 1, currentY)){
+//					this.ottoVonRobot.turnToEast(); 
+//					this.ottoVonRobot.move(1);
+//				}
+//				
+//				else if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnTop(currentX, currentY) == false && this.ottoVonRobot.robotMaze.isEndPosition(currentX, currentY - 1)){
+//					this.ottoVonRobot.turnToNorth(); 
+//					this.ottoVonRobot.move(1);
+//				}
+//				
+//				else if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnBottom(currentX, currentY) == false && this.ottoVonRobot.robotMaze.isEndPosition(currentX, currentY + 1)){
+//					this.ottoVonRobot.turnToSouth(); 
+//					this.ottoVonRobot.move(1);
+//				}
+				
+				if (northDist == this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX, currentY) - 1){
+					this.ottoVonRobot.turnToNorth();
+					this.ottoVonRobot.move(1);
+				}
+				else if (southDist == this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX, currentY) - 1){
+					this.ottoVonRobot.turnToSouth();
+					this.ottoVonRobot.move(1);
+				}
+				else if (eastDist == this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX, currentY) - 1){
+					this.ottoVonRobot.turnToEast(); 
+					this.ottoVonRobot.move(1);
+				}
+				else if (westDist == this.ottoVonRobot.robotMaze.mazedists.getDistance(currentX, currentY) - 1){
+					this.ottoVonRobot.turnToWest(); 
+					this.ottoVonRobot.move(1);
+				}
+				
+				northDist = Integer.MAX_VALUE; 
+				southDist = Integer.MAX_VALUE;
+				eastDist = Integer.MAX_VALUE; 
+				westDist = Integer.MAX_VALUE; 
+
+				
+			}
+			
+
+
+		while (this.ottoVonRobot.robotMaze.isEndPosition(currentX, currentY) == false){
+			
+			currentX = this.ottoVonRobot.getCurrentPosition()[0]; 
+			currentY = this.ottoVonRobot.getCurrentPosition()[1]; 
+			
+		if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnTop(currentX, currentY) == false){
+
+			this.ottoVonRobot.turnToNorth();
+			if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == Integer.MAX_VALUE){
+				this.ottoVonRobot.move(1);
+				
+			}
+		}
+		else if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnRight(currentX, currentY) == false){
+
+
+			this.ottoVonRobot.turnToEast();
+			if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == Integer.MAX_VALUE){
+				this.ottoVonRobot.move(1);
+				
+
+			}
+		}
+		else if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnBottom(currentX, currentY) == false){
+			this.ottoVonRobot.turnToSouth();
+			if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == Integer.MAX_VALUE){
+				this.ottoVonRobot.move(1);
+				
+
+			}
+		}
+		else if (this.ottoVonRobot.robotMaze.mazecells.hasWallOnLeft(currentX, currentY) == false){
+
+
+			this.ottoVonRobot.turnToWest();
+			if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == Integer.MAX_VALUE){
+				this.ottoVonRobot.move(1);
+			}
+		}
+		}
+
+
+		return true; 
+			
+		}
+
+		catch(Exception exception){
+			if(this.ottoVonRobot.isAtGoal() == true){
+				this.ottoVonRobot.robotMaze.state = Constants.STATE_FINISH; 
+				return true; 
+			}
+			this.ottoVonRobot.robotMaze.state = Constants.STATE_UNFINISH;
+			this.ottoVonRobot.robotMaze.notifyViewerRedraw();
+			return false;
+			
+				
+			}	
+
+}
+}	

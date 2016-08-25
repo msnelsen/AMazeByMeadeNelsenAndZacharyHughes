@@ -1,0 +1,371 @@
+package edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad;
+
+import java.util.HashMap;
+import java.util.Random;
+
+import edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad.Robot.Turn;
+
+public class Tremaux extends AutoDriver implements RobotDriver {
+   /**
+    * So we do a dfs search(ie., we go down the nodes until we reach the end of a trail, then we turn the robot around)
+    * If we reach a room, hug the left wall until we reach an exit. Follow WallCrawler around.  explore each of these 
+    * routes, marking everything.  if at the end of each of these route, there is no exit, then 
+    * continue on until you reach the room.  At the room, hug the wall until the next exit.  
+    *  
+    *  
+    *  while not at exit: 
+    *  	
+    *  		if robot is in room: 
+    *  			hug left wall until reach an exit
+    *  			exit
+    *  		if at junction
+    *  			if junction not yet taken
+    *  				pick junction at random
+    *  			else
+    *  				keep moving forward
+    *  		if at dead end
+    *  			turn around
+    *  			move until reach junction
+    *  		
+    *  pick a direction at random
+    *  while not at exit
+    *  		if you reach a junction that has not yet been visited
+    *  			pick a random direction at that junction
+    *  		if you reach a junction that has been visited
+    *  			if the current path is marked only once, turn around
+    *  			otherwise, pick the direction with the least number of markings
+    *  		
+    */
+	
+	
+	HashMap<int[], Integer> pathTracker = new HashMap<int[], Integer>(); 
+	
+	public Tremaux(){
+		super();
+	}
+	
+	
+	/**
+	 * Returns a @return boolean. Navigates from the beginning position to the end using a system
+	 * that keeps track of which cells have been visted and recursively backtracks until the solution
+	 * has been reached.   
+	 */
+	@Override 
+	public boolean drive2Exit() throws Exception {
+		try{
+			while(this.ottoVonRobot.isAtGoal() == false){
+			    if(this.ottoVonRobot.isInsideRoom() == true){
+			    	if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) == 0 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+						this.ottoVonRobot.rotate(Turn.RIGHT);
+						this.ottoVonRobot.move(1);
+					}
+					else if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) == 0 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) != 0){
+						this.ottoVonRobot.move(1);
+					}
+					else if (this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) != 0 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+						this.ottoVonRobot.rotate(Turn.LEFT);
+						this.ottoVonRobot.move(1);
+					}
+					else{
+						this.ottoVonRobot.rotate(Turn.LEFT);
+						this.ottoVonRobot.move(1);
+					}
+			    }
+				else if(this.ottoVonRobot.isAtJunction() == false && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+				this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+			}
+	
+			    else if(this.ottoVonRobot.isAtJunction() == false){
+			    	if(pathTracker.get(this.ottoVonRobot.getCurrentPosition()) == null){
+			    		pathTracker.put(this.ottoVonRobot.getCurrentPosition(), 1);	
+			    	}
+			    	else{
+			    		pathTracker.put(this.ottoVonRobot.getCurrentPosition(), 
+			    				pathTracker.get(this.ottoVonRobot.getCurrentPosition()) + 1);
+			    	}
+			    	this.ottoVonRobot.move(1);
+			    }
+				else if(this.ottoVonRobot.isAtJunction() == true && this.ottoVonRobot.isInsideRoom() == false){
+				int[] dxdyl = this.ottoVonRobot.relativeToDXDY(Robot.Direction.LEFT);
+				int[] dxdyr = this.ottoVonRobot.relativeToDXDY(Robot.Direction.RIGHT);
+				int[] dxdyf = this.ottoVonRobot.relativeToDXDY(Robot.Direction.FORWARD);
+				int[] dxdyb = this.ottoVonRobot.relativeToDXDY(Robot.Direction.BACKWARD);
+				int[] pxpy =  this.ottoVonRobot.getCurrentPosition();
+				int[] npxpyl = new int[2];
+				npxpyl[0] = pxpy[0] + dxdyl[0];
+				npxpyl[1] = pxpy[1] + dxdyl[1];
+				int[] npxpyr = new int[2];
+				npxpyr[0] = pxpy[0] + dxdyr[0];
+				npxpyr[1] = pxpy[1] + dxdyr[1];
+				int[] npxpyf = new int[2];
+				npxpyf[0] = pxpy[0] + dxdyf[0];
+				npxpyf[1] = pxpy[1] + dxdyf[1];
+				int[] npxpyb = new int[2];
+				npxpyb[0] = pxpy[0] + dxdyb[0];
+				npxpyb[1] = pxpy[1] + dxdyb[1];
+				Random random = new Random();
+				//LOOK AT OBJECTS HERE: THIS COULD VERY EASILY BE A NULL POINTER
+				if((Integer) pathTracker.get(npxpyl) == null || (Integer) pathTracker.get(npxpyr) == null 
+						|| (Integer) pathTracker.get(npxpyb) == null || (Integer) pathTracker.get(npxpyf) == null){
+					
+                    
+                      
+                      boolean hasMoved = false;
+					while(hasMoved == false){
+						hasMoved = false;
+						int direction = random.nextInt(3);
+						if(direction == 0 &&  pathTracker.get(npxpyl) == null && this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) != 0){
+							this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+							this.ottoVonRobot.move(1);
+							hasMoved = true;
+							this.pathTracker.put(npxpyl, pathTracker.get(npxpyl) + 1);
+						}
+						
+						
+						if(direction == 1 && pathTracker.get(npxpyr) == null && this.senseRight() == false){
+							this.ottoVonRobot.rotate(Robot.Turn.RIGHT);
+							
+							this.ottoVonRobot.move(1);
+							hasMoved = true;
+							this.pathTracker.put(npxpyr, pathTracker.get(npxpyf) + 1);
+							
+						}
+						
+						
+						if(direction == 2 && pathTracker.get(npxpyf) == null && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) != 0){
+							this.ottoVonRobot.move(1);
+							hasMoved = true;
+							this.pathTracker.put(npxpyf, pathTracker.get(npxpyf) + 1);
+						}
+//						if(direction == 3 && pathTracker.get(npxpyb) == null){
+//							System.out.println("Thing10");
+//							this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+//							this.ottoVonRobot.move(1);
+//							this.pathTracker.put(pxpy, 1);
+//						}
+						dxdyl = this.ottoVonRobot.relativeToDXDY(Robot.Direction.LEFT);
+						dxdyr = this.ottoVonRobot.relativeToDXDY(Robot.Direction.RIGHT);
+						dxdyf = this.ottoVonRobot.relativeToDXDY(Robot.Direction.FORWARD);
+						dxdyb = this.ottoVonRobot.relativeToDXDY(Robot.Direction.BACKWARD);
+						
+						npxpyl[0] = pxpy[0] + dxdyl[0];
+						npxpyl[1] = pxpy[1] + dxdyl[1];
+						
+						npxpyr[0] = pxpy[0] + dxdyr[0];
+						npxpyr[1] = pxpy[1] + dxdyr[1];
+						npxpyf[0] = pxpy[0] + dxdyf[0];
+						npxpyf[1] = pxpy[1] + dxdyf[1];
+					
+						npxpyb[0] = pxpy[0] + dxdyb[0];
+						npxpyb[1] = pxpy[1] + dxdyb[1];
+					}
+					
+				}
+				else{
+					if(pathTracker.get(npxpyl) == 1 || pathTracker.get(npxpyr) == 1 || pathTracker.get(npxpyb) == 1 || pathTracker.get(npxpyf) == 1){
+						boolean hasMoved = false;
+						while(hasMoved == false){
+							hasMoved = false;
+							int direction = random.nextInt(4);
+							if(direction == 0 &&  pathTracker.get(npxpyl) == 1 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) == 0){
+								this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+								this.ottoVonRobot.move(1);
+								hasMoved = true;
+								this.pathTracker.put(npxpyl, this.pathTracker.get(npxpyl) + 1);
+							}
+							if(direction == 1 && pathTracker.get(npxpyr) == 1 && senseRight() == false){
+								
+				                    this.ottoVonRobot.rotate(Robot.Turn.RIGHT);
+								    this.ottoVonRobot.move(1);
+								    hasMoved = true;
+								    this.pathTracker.put(npxpyr, this.pathTracker.get(npxpyl) + 1);
+								
+							}
+							if(direction == 2 && pathTracker.get(npxpyf) == 1 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+								this.ottoVonRobot.move(1);
+								hasMoved = true;
+								this.pathTracker.put(npxpyf, this.pathTracker.get(npxpyf) + 1);
+							}
+							if(direction == 3 && pathTracker.get(npxpyb) == 1){
+								this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+								this.ottoVonRobot.move(1);
+								hasMoved = true;
+								this.pathTracker.put(npxpyb, this.pathTracker.get(npxpyb) + 1 );;
+							}
+						}
+				}
+			}
+		}
+	}
+	
+
+
+			
+			return true;
+		}
+		catch(Exception exception){
+			if(this.ottoVonRobot.robotMaze.isEndPosition(this.ottoVonRobot.robotMaze.px, this.ottoVonRobot.robotMaze.py)){
+			this.ottoVonRobot.robotMaze.state = Constants.STATE_FINISH; 
+			return true; 
+		}
+		this.ottoVonRobot.robotMaze.state = Constants.STATE_UNFINISH;
+		this.ottoVonRobot.robotMaze.notifyViewerRedraw();
+		return false;
+		}
+		
+		
+	}
+
+//		try{
+//			while(this.ottoVonRobot.isAtGoal() == false){
+// ADD BACK THE WALL FOLLOWER HERE IF THIS DOESNT WORK!!!!!!!!!!!!!!!!!!!!!!
+//				
+//				else if(this.ottoVonRobot.isAtJunction() == false && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+//					this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+//				}
+//				else if(this.ottoVonRobot.isAtJunction() == false && pathTracker.get(this.ottoVonRobot.getCurrentPosition()) == null){
+//					this.ottoVonRobot.move(1);
+//					pathTracker.put(this.ottoVonRobot.getCurrentPosition(), 1);
+//				}else if(this.ottoVonRobot.isAtJunction() == false && pathTracker.get(this.ottoVonRobot.getCurrentPosition()) == 1){
+//					this.ottoVonRobot.move(1);
+//					pathTracker.put(this.ottoVonRobot.getCurrentPosition(), 2);
+//				}
+//				else if(this.ottoVonRobot.isAtJunction() == true && this.ottoVonRobot.isInsideRoom() == false){
+//					int[] dxdyl = this.ottoVonRobot.relativeToDXDY(Robot.Direction.LEFT);
+//					int[] dxdyr = this.ottoVonRobot.relativeToDXDY(Robot.Direction.RIGHT);
+//					int[] dxdyf = this.ottoVonRobot.relativeToDXDY(Robot.Direction.FORWARD);
+//					int[] dxdyb = this.ottoVonRobot.relativeToDXDY(Robot.Direction.BACKWARD);
+//					int[] pxpy =  this.ottoVonRobot.getCurrentPosition();
+//					int[] npxpyl = new int[2];
+//					npxpyl[0] = pxpy[0] + dxdyl[0];
+//					npxpyl[1] = pxpy[1] + dxdyl[1];
+//					int[] npxpyr = new int[2];
+//					npxpyr[0] = pxpy[0] + dxdyr[0];
+//					npxpyr[1] = pxpy[1] + dxdyr[1];
+//					int[] npxpyf = new int[2];
+//					npxpyf[0] = pxpy[0] + dxdyf[0];
+//					npxpyf[1] = pxpy[1] + dxdyf[1];
+//					int[] npxpyb = new int[2];
+//					npxpyb[0] = pxpy[0] + dxdyb[0];
+//					npxpyb[1] = pxpy[1] + dxdyb[1];
+//					Random random = new Random();
+//					//LOOK AT OBJECTS HERE: THIS COULD VERY EASILY BE A NULL POINTER
+//					if((Integer) pathTracker.get(npxpyl) == null || (Integer) pathTracker.get(npxpyr) == null 
+//							|| (Integer) pathTracker.get(npxpyb) == null || (Integer) pathTracker.get(npxpyf) == null){
+//						
+//                        
+//                          
+//                          boolean hasMoved = false;
+//						while(hasMoved == false){
+//							hasMoved = false;
+//							int direction = random.nextInt(3);
+//							if(direction == 0 &&  pathTracker.get(npxpyl) == null && this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) != 0){
+//								this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+//								this.ottoVonRobot.move(1);
+//								hasMoved = true;
+//								this.pathTracker.put(npxpyl, 1);
+//							}
+//							
+//							
+//							if(direction == 1 && pathTracker.get(npxpyr) == null && this.senseRight() == false){
+//								this.ottoVonRobot.rotate(Robot.Turn.RIGHT);
+//								
+//								this.ottoVonRobot.move(1);
+//								hasMoved = true;
+//								this.pathTracker.put(npxpyr, 1);
+//								
+//							}
+//							
+//							
+//							if(direction == 2 && pathTracker.get(npxpyf) == null && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) != 0){
+//								this.ottoVonRobot.move(1);
+//								hasMoved = true;
+//								this.pathTracker.put(npxpyf, 1);
+//							}
+////							if(direction == 3 && pathTracker.get(npxpyb) == null){
+////								System.out.println("Thing10");
+////								this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+////								this.ottoVonRobot.move(1);
+////								this.pathTracker.put(pxpy, 1);
+////							}
+//							dxdyl = this.ottoVonRobot.relativeToDXDY(Robot.Direction.LEFT);
+//							dxdyr = this.ottoVonRobot.relativeToDXDY(Robot.Direction.RIGHT);
+//							dxdyf = this.ottoVonRobot.relativeToDXDY(Robot.Direction.FORWARD);
+//							dxdyb = this.ottoVonRobot.relativeToDXDY(Robot.Direction.BACKWARD);
+//							
+//							npxpyl[0] = pxpy[0] + dxdyl[0];
+//							npxpyl[1] = pxpy[1] + dxdyl[1];
+//							
+//							npxpyr[0] = pxpy[0] + dxdyr[0];
+//							npxpyr[1] = pxpy[1] + dxdyr[1];
+//							npxpyf[0] = pxpy[0] + dxdyf[0];
+//							npxpyf[1] = pxpy[1] + dxdyf[1];
+//						
+//							npxpyb[0] = pxpy[0] + dxdyb[0];
+//							npxpyb[1] = pxpy[1] + dxdyb[1];
+//						}
+//						
+//					}
+//					else{
+//						if(pathTracker.get(npxpyl) == 1 || pathTracker.get(npxpyr) == 1 || pathTracker.get(npxpyb) == 1 || pathTracker.get(npxpyf) == 1){
+//							boolean hasMoved = false;
+//							while(hasMoved == false){
+//								hasMoved = false;
+//								int direction = random.nextInt(4);
+//								if(direction == 0 &&  pathTracker.get(npxpyl) == 1 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.LEFT) == 0){
+//									this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+//									this.ottoVonRobot.move(1);
+//									hasMoved = true;
+//									this.pathTracker.put(npxpyl, 2);
+//								}
+//								if(direction == 1 && pathTracker.get(npxpyr) == 1 && senseRight() == false){
+//									
+//					                    this.ottoVonRobot.rotate(Robot.Turn.RIGHT);
+//									    this.ottoVonRobot.move(1);
+//									    hasMoved = true;
+//									    this.pathTracker.put(npxpyr, 2);
+//									
+//								}
+//								if(direction == 2 && pathTracker.get(npxpyf) == 1 && this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+//									this.ottoVonRobot.move(1);
+//									hasMoved = true;
+//									this.pathTracker.put(npxpyf, 2);
+//								}
+//								if(direction == 3 && pathTracker.get(npxpyb) == 1){
+//									this.ottoVonRobot.rotate(Robot.Turn.AROUND);
+//									this.ottoVonRobot.move(1);
+//									hasMoved = true;
+//									this.pathTracker.put(npxpyb, 2);;
+//								}
+//							}
+//					}
+//				}
+//			}
+//		}
+//		
+//			return true;
+//		}
+//			catch(Exception exception){
+//				if(this.ottoVonRobot.robotMaze.isEndPosition(this.ottoVonRobot.robotMaze.px, this.ottoVonRobot.robotMaze.py)){
+//					this.ottoVonRobot.robotMaze.state = Constants.STATE_FINISH; 
+//					return true; 
+//				}
+//				this.ottoVonRobot.robotMaze.state = Constants.STATE_UNFINISH;
+//				this.ottoVonRobot.robotMaze.notifyViewerRedraw();
+//				return false;
+//	}
+//		
+//		
+//}
+public boolean senseRight() throws Exception{
+	this.ottoVonRobot.rotate(Robot.Turn.RIGHT);
+	if(this.ottoVonRobot.distanceToObstacle(Robot.Direction.FORWARD) == 0){
+		this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+		return true;
+			
+	}else{
+		this.ottoVonRobot.rotate(Robot.Turn.LEFT);
+		return false;
+	}
+}
+}

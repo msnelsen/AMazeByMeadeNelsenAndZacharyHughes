@@ -1,0 +1,121 @@
+package edu.wm.cs.cs301.amazebymeadenelsenandzacharyhughes.falstad;
+import java.awt.*;
+
+/**
+ *
+ *It is the interface for solving mazes using key input, which are passed to the ManualDriver from maze by the robot.
+ *collaborates with the basicRobot class directly.  
+ *
+ */	
+
+public class ManualDriver implements RobotDriver {
+    
+	BasicRobot manualRobot;
+	int width, height;
+	Distance distance;
+	String cryOfTheDamned;
+	int counter;
+	
+	/**
+	 * Sets the ManualDriver's robot, from @param r, and checks to make sure the robot has a distance sensor
+	 */
+	@Override
+	public void setRobot(Robot r) throws UnsuitableRobotException {
+
+		this.manualRobot = (BasicRobot) r;
+
+
+	}
+
+	/**
+	 * Sets the width and height of the ManualDriver from the @param width and @param height, which are passed in.
+	 */
+	@Override
+	public void setDimensions(int width, int height) {
+
+		this.width = width;
+		this.height = height;
+
+	}
+
+	/**
+	 * Sets the distance from @param distance
+	 */
+	@Override
+	public void setDistance(Distance distance) {
+
+        this.distance = distance;
+	}
+
+	/**
+	 * Takes in manual input, allowing users to drive the robot to the maze's exit. Or die trying. 
+	 */
+	@Override
+	public boolean drive2Exit() throws Exception {
+		try{
+		if(this.cryOfTheDamned == "UP"){
+			System.out.println("Robot moved forward");
+			this.manualRobot.move(1);
+			this.counter++;
+		}
+		if(this.cryOfTheDamned == "LEFT"){
+			System.out.println("Robot turned left");
+			this.manualRobot.rotate(Robot.Turn.LEFT);
+		}
+		if(this.cryOfTheDamned == "RIGHT"){
+			System.out.println("Robot turned right");
+			this.manualRobot.rotate(Robot.Turn.RIGHT);
+		}
+		if(this.cryOfTheDamned == "DOWN"){
+			System.out.println("Robot turned around");
+			this.manualRobot.rotate(Robot.Turn.AROUND);
+		}
+		return true;
+		}
+		catch(Exception exception){
+			if(this.manualRobot.robotMaze.isEndPosition(this.manualRobot.robotMaze.px, this.manualRobot.robotMaze.py)){
+				this.manualRobot.robotMaze.state = Constants.STATE_FINISH; 
+				return true; 
+			}
+			
+			this.manualRobot.robotMaze.state = Constants.STATE_UNFINISH;
+			exception.printStackTrace(); 
+
+			this.manualRobot.robotMaze.notifyViewerRedraw();
+			return false;
+			
+		}
+	}
+
+	/**
+	 * Returns the initial battery level subtracted the current battery level
+	 */
+	@Override
+	public float getEnergyConsumption() {
+
+		return 2500 - this.manualRobot.getBatteryLevel();
+	}
+
+	/**
+	 * returns the distance traveled
+	 */
+	@Override
+	public int getPathLength() {
+
+		return this.manualRobot.counter;
+	}
+	
+	/**
+	 * Notices information being passed to the driver from other classes
+	 */
+	public void hearTheCriesOfTheDamned() throws Exception{
+		this.cryOfTheDamned = this.manualRobot.thatWhichHasBeenPassed;
+		this.drive2Exit();		
+	}
+	public void setBasicRobot(BasicRobot robot){
+		this.manualRobot = robot;
+		this.manualRobot.setDriver(this);
+		
+	}
+
+}
